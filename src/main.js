@@ -1,10 +1,16 @@
 import Vue from 'vue'
+import Vuex from 'vuex'
 import App from './App.vue'
 import router from './router'
+
+import * as waxjs from "@waxio/waxjs/dist"
+
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
 
-const options = {
+Vue.use(Vuex)
+
+Vue.use(Toast, {
   transition: "Vue-Toastification__bounce",
   maxToasts: 20,
   newestOnTop: true,
@@ -20,10 +26,32 @@ const options = {
   closeButton: "button",
   icon: true,
   rtl: false
-};
+})
 
 Vue.config.productionTip = false
-Vue.use(Toast, options)
+
+Vue.prototype.$store = new Vuex.Store({
+  state: {
+    wcwName : null,
+    wax : Object,
+    waxjs : waxjs,
+    path : "https://mypinata.cloud/ipfs/",
+    rpcList : ['https://wax.greymass.com',
+      'https://wax.cryptolions.io',
+      'https://api.waxsweden.org',
+      'https://wax.api.zenblocks.io',
+      'https://api.wax.greeneosio.com',
+    ]
+  },
+  mutations: {
+    setWcwName(state, wcwName) {
+      state.wcwName = wcwName
+    },
+    setWax(state, wax) {
+      state.wax = wax
+    }
+  }
+})
 
 new Vue({
   router,

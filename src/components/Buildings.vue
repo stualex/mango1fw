@@ -2,15 +2,16 @@
     <div>
         <div class="header">
             <h1>Buildings</h1>
+            <ToggleSwitch @switch-click="autoClaimClick" />
         </div>
         <div class="buildings">
             <div class="building" :key="bld.asset_id" v-for="bld in buildings">
-                <img :src="path + bldconf.filter(data => data.template_id === bld.template_id)[0].img">
+                <img :src="$store.state.path + bldconf.filter(data => data.template_id === bld.template_id)[0].img">
                 <p>{{bldconf.filter(data => data.template_id === bld.template_id)[0].name}}</p>
                 <p>{{bld.times_claimed}}/{{bldconf.filter(data => data.template_id === bld.template_id)[0].required_claims}} Claimed</p>
                 <CountDown v-if="bld.next_availability !== 0"
-                    @endTime="$emit('bldclaim', bld)"
-                    :endDate="new Date((bld.next_availability) * 1000)">
+                    @endTime="autoclaim ? bldclaim(bld) : null"
+                    :endDate="new Date(bld.next_availability * 1000)">
                     <p slot-scope="data" v-text="data.hour + ':' + data.min + ':' + data.sec"/>
                 </CountDown>
                 <p v-else>Completed</p>
@@ -21,21 +22,99 @@
 
 <script>
 import CountDown from '@/components/CountDown.vue'
+import ToggleSwitch from '@/components/ToggleSwitch.vue'
                     
 export default {
     name: 'Buildings',
     components: {
         CountDown,
-    },
-    props: {
-        buildings: {},
-        bldconf: {},
+        ToggleSwitch,
     },
     data() {
         return {
-            //path: 'https://ipfs.atomichub.io/ipfs/',
-            path: 'https://mypinata.cloud/ipfs/',
+            autoclaim: false,
+            buildings: {},
+            bldconf: {},
+            refreshTimeOut: null,
         }
+    },
+    created: function () {
+        this.getTables()
+    },
+    methods: {
+
+        autoClaimClick(bool) {
+            this.autoclaim = bool
+        },
+        
+        async getTables() {
+            try {
+                const bldconfTable = await this.$store.state.wax.api.rpc.get_table_rows({
+                    "json": true,
+                    "code": "farmersworld",
+                    "scope": "farmersworld",
+                    "table": "bldconf",
+                    "lower_bound": "",
+                    "upper_bound": "",
+                    "index_position": 1,
+                    "key_type": "",
+                    "limit": 100,
+                    "reverse": false,
+                    "show_payer": false
+                })
+                this.bldconf = bldconfTable.rows
+                
+                const buildingsTable = await this.$store.state.wax.api.rpc.get_table_rows({
+                    "json": true, 
+                    "code": "farmersworld", 
+                    "scope": "farmersworld", 
+                    "table": "buildings",
+                    "lower_bound": this.$store.state.wcwName, 
+                    "upper_bound": this.$store.state.wcwName, 
+                    "index_position": 2,
+                    "key_type": "i64",
+                    "reverse": false,
+                    "show_payer": false,
+                })
+                this.buildings = buildingsTable.rows
+            } catch (e) {
+                console.log(e)
+            }
+        },
+
+        async bldclaim(bld) {
+            try {
+                const res = await this.$store.state.wax.api.transact({
+                actions: [{
+                    account: "farmersworld", 
+                    name: "bldclaim", 
+                    authorization: [{
+                    actor: this.$store.state.wcwName,
+                    permission: "active",
+                    }], 
+                    data: {
+                    owner: this.$store.state.wcwName,
+                    asset_id: bld.asset_id,
+                    },
+                }]
+                }, {
+                    blocksBehind: 3,
+                    expireSeconds: 1200,
+                })
+                
+                this.$toast(bld.name + ' claimed')
+            } catch(e) { 
+                console.log(e)
+            } 
+            this.refresh()
+        },
+
+        refresh() {
+            clearTimeout(this.refreshTimeOut)
+            this.refreshTimeOut = setTimeout(() => {
+                this.getTables()
+            }, 1000)
+        },
     }
 }
 </script>
@@ -67,8 +146,11 @@ export default {
 }
 
 .header {
-    border-bottom: 1px solid steelblue;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
+    border-bottom: 1px solid steelblue;
 }
 
 </style>

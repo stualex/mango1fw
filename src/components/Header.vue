@@ -1,21 +1,22 @@
 <template>
   <header>
-    <h1>{{ title }}</h1>
-    <Button @btn-click="$emit('toggleConnect')"
-      :text="account.account ? account.account : 'Login'"
-      :color="account.account ? 'red' : 'green'"
+    <h1 v-if="loggedIn">Farmer {{ $store.state.wcwName }}</h1>
+    <h1 v-else>{{ title }}</h1>
+    <Button @btn-click="$emit('btnClick')"
+      :text="loggedIn ? 'Logout' : 'Login'"
+      :color="loggedIn ? 'red' : 'green'"
     />
   </header>
 </template>
 
 <script>
-import Button from './Button'
+import Button from './Button.vue'
 
 export default {
   name: 'Header',
   props: {
     title: String,
-    account: {}
+    loggedIn: Boolean
   },
   components: {
     Button,

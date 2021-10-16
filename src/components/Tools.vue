@@ -2,13 +2,14 @@
     <div>
         <div class="header">
             <h1>Tools</h1>
+            <ToggleSwitch @switch-click="autoClaimClick"/>
         </div>
         <div class="tools">
             <div class="tool" :key="tool.asset_id" v-for="tool in tools">
-                <img :src="path + toolconfs.filter(data => data.template_id === tool.template_id)[0].img">
+                <img :src="$store.state.path + toolconfs.filter(data => data.template_id === tool.template_id)[0].img">
                 <p>{{getDurability(tool)}}</p>
                 <CountDown
-                    @endTime="$emit('claim', tool.asset_id)"
+                    @endTime="autoclaim ? claim(tool.asset_id) : null"
                     :endDate="new Date(tool.next_availability * 1000)">
                     <p slot-scope="data" v-text="data.hour + ':' + data.min + ':' + data.sec"/>
                 </CountDown>
@@ -20,31 +21,137 @@
 <script>
 import CountDown from '@/components/CountDown.vue'
 import Button from '@/components/Button.vue'
+import ToggleSwitch from '@/components/ToggleSwitch.vue'
                     
 export default {
     name: 'Tools',
     components: {
         CountDown,
-        Button
+        Button,
+        ToggleSwitch,
     },
-    props: {
-        tools: {},
-        toolconfs: {},
-    },
-    emits: ['repair'],
     data() {
         return {
-            //path: 'https://ipfs.atomichub.io/ipfs/',
-            path: 'https://mypinata.cloud/ipfs/',
+            autoclaim: false,
+            tools: {},
+            toolconfs: {},
+            refreshTimeOut: null,
         }
     },
+    created: function () {
+        this.getTables()
+    },
     methods: {
+
+        autoClaimClick(bool) {
+            this.autoclaim = bool
+        },
+
         getDurability(tool) {
-            console.log
-            if (tool.current_durability === 0 )
-                this.$emit('repair', tool)
+            if (tool.current_durability === 0 && this.autoclaim)
+                this.repair(tool)
             return tool.current_durability + '/' + tool.durability
-        }
+        },
+        
+        async getTables() {
+            try {
+                const toolconfsTable = await this.$store.state.wax.api.rpc.get_table_rows({
+                "json": true,
+                "code": "farmersworld",
+                "scope": "farmersworld",
+                "table": "toolconfs",
+                "lower_bound": "",
+                "upper_bound": "",
+                "index_position": 1,
+                "key_type": "",
+                "limit": 100,
+                "reverse": false,
+                "show_payer": false
+                })
+                this.toolconfs = toolconfsTable.rows
+
+                const toolsTable = await this.$store.state.wax.api.rpc.get_table_rows({
+                "json": true, 
+                "code": "farmersworld", 
+                "scope": "farmersworld", 
+                "table": "tools",
+                "lower_bound": this.$store.state.wcwName, 
+                "upper_bound": this.$store.state.wcwName, 
+                "index_position": 2,
+                "key_type": "i64",
+                "reverse": false,
+                "show_payer": false,
+                })
+                this.tools = toolsTable.rows
+            } catch (e) {
+                console.log(e)
+            }
+        },
+
+        async claim(assetId) {
+            try {
+                const res = await this.$store.state.wax.api.transact({
+                actions: [{
+                    account: "farmersworld", 
+                    name: "claim", 
+                    authorization: [{
+                    actor: this.$store.state.wcwName,
+                    permission: "active",
+                    }], 
+                    data: {
+                    owner: this.$store.state.wcwName,
+                    asset_id: assetId,
+                    },
+                }]
+                }, {
+                    blocksBehind: 3,
+                    expireSeconds: 1200,
+                })
+
+                console.log(res)
+                const logclaim = res.processed.action_traces.filter(e => e.receiver === "farmersworld")[0].inline_traces.filter(e => e.receiver === "farmersworld").filter(e => e.act.name === "logclaim")[0].act.data.rewards[0]
+                const logbonus = res.processed.action_traces.filter(e => e.receiver === "farmersworld")[0].inline_traces.filter(e => e.receiver === "farmersworld").filter(e => e.act.name === "logbonus")[0].act.data.bonus_rewards[0]
+                this.$toast(<div>Claimed {logclaim}<br />Bonus {logbonus}</div>)
+
+                this.refresh()
+            } catch(e) { 
+                console.log(e)
+            }
+        },
+
+        async repair(tool) {
+            try {
+                const res = await this.$store.state.wax.api.transact({
+                actions: [{
+                    account: "farmersworld", 
+                    name: "repair", 
+                    authorization: [{
+                    actor: this.$store.state.wcwName,
+                    permission: "active",
+                    }], 
+                    data: {
+                    asset_owner: this.$store.state.wcwName,
+                    asset_id: tool.asset_id,
+                    },
+                }]
+                }, {
+                blocksBehind: 3,
+                expireSeconds: 1200,
+                })
+                console.log(res)
+                this.$toast(this.toolconfs.filter(e => e.template_id === tool.template_id)[0].template_name + ' Repaired')
+            } catch(e) { 
+                console.log(e)
+            } 
+            this.refresh()
+        },
+
+        refresh() {
+            clearTimeout(this.refreshTimeOut)
+            this.refreshTimeOut = setTimeout(() => {
+                this.getTables()
+            }, 1000)
+        },
     }
 }
 </script>
@@ -76,8 +183,11 @@ export default {
 }
 
 .header {
-    border-bottom: 1px solid steelblue;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
+    border-bottom: 1px solid steelblue;
 }
 
 </style>
