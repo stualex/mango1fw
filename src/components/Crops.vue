@@ -113,6 +113,7 @@ export default {
             clearTimeout(this.refreshTimeOut)
             this.refreshTimeOut = setTimeout(() => {
                 this.getTables()
+                this.$emit('recover')
             }, 1000)
         },
     }

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="items.length">
         <div class="header">
             <h1>Animals</h1>
             <ToggleSwitch @switch-click="autoClaimClick" />
@@ -9,7 +9,7 @@
                 <img :src="$store.state.path + anmconf.filter(e => e.template_id === anm.template_id)[0].img">
                 <p>{{anm.name}}</p>
                 <p>{{anm.times_claimed}}/{{anmconf.filter(e => e.template_id === anm.template_id)[0].required_claims}} Claimed</p>
-                <CountDown v-if="anm.next_availability !== 0 && anm.day_claims_at.length !== anmconf.filter(e => e.template_id === anm.template_id)[0].daily_claim_limit"
+                <CountDown v-if="canClaim(anm)"
                     @endTime="autoclaim ? doEmit(anm) : null"
                     :endDate="new Date(anm.next_availability * 1000)">
                     <p slot-scope="data" v-text="data.hour + ':' + data.min + ':' + data.sec"/>
@@ -51,10 +51,23 @@ export default {
             this.autoclaim = bool
         },
 
+        canClaim(anm) {
+            const now = new Date()
+            const firstclaim = new Date(anm.day_claims_at[0])
+            const required = this.anmconf.filter(e => e.template_id === anm.template_id)[0]
+
+            if (anm.next_availability !== 0 && (now.getUTCDay() !== firstclaim.getUTCDay() || anm.day_claims_at.length !== required.daily_claim_limit))
+                return true
+            return false
+        },
+
         // Can do better
         canEat(anm) { 
+            const now = new Date()
+            const firstclaim = new Date(anm.day_claims_at[0])
             const required = this.anmconf.filter(e => e.template_id === anm.template_id)[0]
-            if (anm.day_claims_at.length === required.daily_claim_limit)
+
+            if (anm.day_claims_at.length === required.daily_claim_limit && now.getUTCDay() === firstclaim.getUTCDay())
                 return "Daily claim reached"
             if (required.consumed_card !== 0) {
                 const item = this.itemconf.filter(e => e.template_id === required.consumed_card)[0]
@@ -71,11 +84,11 @@ export default {
                 const assets = this.items.filter(e => parseInt(e.template.template_id, 10) === item.template_id)
                 if(required.consumed_quantity <= assets.length && !this.recentlyEmitedTransaction){
                     this.recentlyEmitedTransaction = true
-                    this.transactionTimeout()
                     this.anmclaimburn(anm, assets[0])
+                    this.transactionTimeout()
                 }
             } else {
-                anmclaim(anm)
+                this.anmclaim(anm)
             }
         },
         
@@ -125,7 +138,6 @@ export default {
                 })
                 this.itemconf = itemconfTable.rows
                 
-
                 //Get FW Items
                 const res = await fetch('https://wax.api.atomicassets.io/atomicassets/v1/assets?page=1&limit=1000&template_blacklist=260676&collection_name=farmersworld&owner=' + this.$store.state.wcwName)
                 const results = await res.json()
@@ -208,6 +220,7 @@ export default {
             clearTimeout(this.refreshTimeOut)
             this.refreshTimeOut = setTimeout(() => {
                 this.getTables()
+                this.$emit('recover')
             }, 1000)
         },
     },

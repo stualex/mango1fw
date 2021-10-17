@@ -2,12 +2,12 @@
   <div class="container" id="account">
     <Header title="Farmers World" @btnClick="btnClick" :loggedIn="loggedIn" />
     <div v-if="loggedIn">
-      <Resources />
-      <Tools />
-      <Memberships />
-      <Buildings />
-      <Animals />
-      <Crops /> 
+      <Resources :hasTransactionEmited="hasTransactionEmited" @energyRefreshed="energyRefreshed"/>
+      <Tools @recover="recover" />
+      <Memberships @recover="recover" />
+      <Buildings @recover="recover" />
+      <Animals @recover="recover" />
+      <Crops @recover="recover" /> 
       <Items /> 
     </div>
     <Footer />
@@ -40,7 +40,8 @@ export default {
   },
   data() {
     return {
-      loggedIn: false
+      loggedIn: false,
+      hasTransactionEmited: false
     }
   },
   created: function () {
@@ -90,6 +91,14 @@ export default {
       this.$store.commit('setWax', null)
       this.$store.commit('setWcwName', null)
       this.loggedIn = false
+    },
+
+    recover() {
+      this.hasTransactionEmited = true
+    },
+
+    energyRefreshed() {
+      this.hasTransactionEmited = false
     }
   },
 }

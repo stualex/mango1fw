@@ -14,6 +14,9 @@
 <script>
 export default {
     name: 'Resources',
+    props: {
+        hasTransactionEmited: false,
+    },
     data() {
         return {
             account: {},
@@ -22,6 +25,14 @@ export default {
     },
     created: function () {
         this.getTables()
+    },
+    watch: {
+        hasTransactionEmited : function () {
+            if(this.hasTransactionEmited){
+                this.refresh()
+                this.$emit('energyRefreshed')
+            }
+        }
     },
     methods: {
 
@@ -42,6 +53,7 @@ export default {
             }
             return this.account.energy + '/' + this.account.max_energy
         },
+        
         async getTables() {
             try {
                 const accountTable = await this.$store.state.wax.api.rpc.get_table_rows({
