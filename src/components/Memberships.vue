@@ -85,6 +85,7 @@ export default {
         },
 
         async mbsclaim(mb) {
+            console.log(mb)
             try {
                 const res = await this.$store.state.wax.api.transact({
                 actions: [{
@@ -96,7 +97,7 @@ export default {
                     }], 
                     data: {
                     owner: this.$store.state.wcwName,
-                    asset_id: mb.assetId,
+                    asset_id: mb.asset_id,
                     },
                 }]
                 }, {
