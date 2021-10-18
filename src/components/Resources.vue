@@ -20,7 +20,9 @@ export default {
     data() {
         return {
             account: {},
-            refreshTimeOut: null,
+            recentlyEmitedTransaction: false,
+            refreshTimeout: null,
+            refreshTimeoutTransaction: null
         }
     },
     created: function () {
@@ -38,7 +40,6 @@ export default {
 
         getResourceName(balance){
             const resourceName = balance.substr(balance.indexOf(' ')+1)
-
             return resourceName.charAt(0).toUpperCase() + resourceName.slice(1).toLowerCase()
         },
 
@@ -49,7 +50,7 @@ export default {
         getEnergy(){
             if ((this.account.energy / this.account.max_energy) < 0.20) {
                 const amount = Math.trunc(this.account.max_energy - this.account.energy)
-                this.recover(amount)
+                this.emit(amount)
             }
             return this.account.energy + '/' + this.account.max_energy
         },
@@ -98,9 +99,24 @@ export default {
             this.refresh()
         },
 
+        emit(amount) {
+            if(!this.recentlyEmitedTransaction){
+                this.recentlyEmitedTransaction = true
+                this.recover(amount)
+                this.transactionTimeout()
+            }
+        },
+        
+        transactionTimeout() {
+            clearTimeout(this.refreshTimeoutTransaction)
+            this.refreshTimeoutTransaction = setTimeout(() => {
+                this.recentlyEmitedTransaction = false
+            }, 5000)
+        },
+
         refresh() {
-            clearTimeout(this.refreshTimeOut)
-            this.refreshTimeOut = setTimeout(() => {
+            clearTimeout(this.refreshTimeout)
+            this.refreshTimeout = setTimeout(() => {
                 this.getTables()
             }, 1000)
         },

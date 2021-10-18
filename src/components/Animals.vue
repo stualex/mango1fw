@@ -9,12 +9,13 @@
                 <img :src="$store.state.path + anmconf.filter(e => e.template_id === anm.template_id)[0].img">
                 <p>{{anm.name}}</p>
                 <p>{{anm.times_claimed}}/{{anmconf.filter(e => e.template_id === anm.template_id)[0].required_claims}} Claimed</p>
-                <CountDown v-if="canClaim(anm)"
-                    @endTime="autoclaim ? doEmit(anm) : null"
+                <CountDown
+                    @endTime="autoclaim && hasDailyClaimed(anm) && hasMats(anm) ? emit(anm) : null"
                     :endDate="new Date(anm.next_availability * 1000)">
                     <p slot-scope="data" v-text="data.hour + ':' + data.min + ':' + data.sec"/>
                 </CountDown>
-                <p v-else v-bind:class="{error : anm.next_availability !== 0}">{{canEat(anm)}}</p>
+                <p v-if="!hasDailyClaimed(anm)" v-bind:class="{error : anm.next_availability !== 0}">Daily claim reached</p>
+                <p v-if="!hasMats(anm)" v-bind:class="{error : anm.next_availability !== 0}">Missing {{anmconf.filter(e => e.template_id === anm.template_id)[0].consumed_quantity}} {{itemconf.filter(e => e.template_id === anmconf.filter(e => e.template_id === anm.template_id)[0].consumed_card)[0].name}}</p>
             </div>
         </div>
     </div>
@@ -51,45 +52,32 @@ export default {
             this.autoclaim = bool
         },
 
-        canClaim(anm) {
-            const now = new Date()
-            const firstclaim = new Date(anm.day_claims_at[0])
-            const required = this.anmconf.filter(e => e.template_id === anm.template_id)[0]
+        // Does it have claimed the daily limit
+        hasDailyClaimed(anm) { 
+            const anmconf = this.anmconf.filter(e => e.template_id === anm.template_id)[0]
 
-            if (anm.next_availability !== 0 && (now.getUTCDay() !== firstclaim.getUTCDay() || anm.day_claims_at.length !== required.daily_claim_limit))
-                return true
-            return false
+            const now = new Date()
+            const firstclaim = new Date(anm.day_claims_at[0] * 1000)
+
+            if (anm.day_claims_at.length === anmconf.daily_claim_limit && now.getUTCDay() !== firstclaim.getUTCDay())
+                return false
+            return true
         },
 
-        // Can do better
-        canEat(anm) { 
-            const now = new Date()
-            const firstclaim = new Date(anm.day_claims_at[0])
-            const required = this.anmconf.filter(e => e.template_id === anm.template_id)[0]
-
-            if (anm.day_claims_at.length === required.daily_claim_limit && now.getUTCDay() === firstclaim.getUTCDay())
-                return "Daily claim reached"
-            if (required.consumed_card !== 0) {
-                const item = this.itemconf.filter(e => e.template_id === required.consumed_card)[0]
-                const assets = this.items.filter(e => parseInt(e.template.template_id, 10) === item.template_id)
-                if(required.consumed_quantity > assets.length)
-                    return "Missing " + required.consumed_quantity + ' ' + item.name
-            }
+        getConsumedItems(anm){
+            const anmconf = this.anmconf.filter(e => e.template_id === anm.template_id)[0]
+            const item = this.itemconf.filter(e => e.template_id === anmconf.consumed_card)[0]
+            return this.items.filter(e => parseInt(e.template.template_id, 10) === item.template_id)
         },
 
-        doEmit(anm) {
-            const required = this.anmconf.filter(e => e.template_id === anm.template_id)[0]
-            if (required.consumed_card !== 0) {
-                const item = this.itemconf.filter(e => e.template_id === required.consumed_card)[0]
-                const assets = this.items.filter(e => parseInt(e.template.template_id, 10) === item.template_id)
-                if(required.consumed_quantity <= assets.length && !this.recentlyEmitedTransaction){
-                    this.recentlyEmitedTransaction = true
-                    this.anmclaimburn(anm, assets[0])
-                    this.transactionTimeout()
-                }
-            } else {
-                this.anmclaim(anm)
+        // Does it have the required nft to claim
+        hasMats(anm) {
+            const anmconf = this.anmconf.filter(e => e.template_id === anm.template_id)[0]
+            if (anmconf.consumed_card !== 0) {
+                if(anmconf.consumed_quantity > this.getConsumedItems(anm).length)
+                    return false
             }
+            return true
         },
         
         async getTables() {
@@ -208,12 +196,23 @@ export default {
             } 
             this.refresh()
         },
+
+        emit(anm) {
+            if(!this.recentlyEmitedTransaction){
+                this.recentlyEmitedTransaction = true
+                if(this.hasMats(anm))
+                    this.anmclaimburn(anm, this.getConsumedItems(anm)[0])
+                else
+                    this.anmclaim(anm)
+                this.transactionTimeout()
+            }
+        },
         
         transactionTimeout() {
             clearTimeout(this.refreshTimeoutTransaction)
             this.refreshTimeoutTransaction = setTimeout(() => {
                 this.recentlyEmitedTransaction = false
-            }, 30000)
+            }, 10000)
         },
 
         refresh() {

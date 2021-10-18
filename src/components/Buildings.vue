@@ -10,7 +10,7 @@
                 <p>{{bldconf.filter(data => data.template_id === bld.template_id)[0].name}}</p>
                 <p>{{bld.times_claimed}}/{{bldconf.filter(data => data.template_id === bld.template_id)[0].required_claims}} Claimed</p>
                 <CountDown v-if="bld.next_availability !== 0"
-                    @endTime="autoclaim ? bldclaim(bld) : null"
+                    @endTime="autoclaim ? emit(bld) : null"
                     :endDate="new Date(bld.next_availability * 1000)">
                     <p slot-scope="data" v-text="data.hour + ':' + data.min + ':' + data.sec"/>
                 </CountDown>
@@ -35,7 +35,9 @@ export default {
             autoclaim: false,
             buildings: {},
             bldconf: {},
-            refreshTimeOut: null,
+            recentlyEmitedTransaction: false,
+            refreshTimeout: null,
+            refreshTimeoutTransaction: null
         }
     },
     created: function () {
@@ -109,9 +111,24 @@ export default {
             this.refresh()
         },
 
+        emit(bld) {
+            if(!this.recentlyEmitedTransaction){
+                this.recentlyEmitedTransaction = true
+                this.bldclaim(bld)
+                this.transactionTimeout()
+            }
+        },
+        
+        transactionTimeout() {
+            clearTimeout(this.refreshTimeoutTransaction)
+            this.refreshTimeoutTransaction = setTimeout(() => {
+                this.recentlyEmitedTransaction = false
+            }, 5000)
+        },
+
         refresh() {
-            clearTimeout(this.refreshTimeOut)
-            this.refreshTimeOut = setTimeout(() => {
+            clearTimeout(this.refreshTimeout)
+            this.refreshTimeout = setTimeout(() => {
                 this.getTables()
                 this.$emit('recover')
             }, 1000)

@@ -9,7 +9,7 @@
                 <img :src="$store.state.path + mbsconf.filter(data => data.template_id === mb.template_id)[0].img">
                 <p>{{mbsconf.filter(data => data.template_id === mb.template_id)[0].name + ' ' + mb.type}}</p>
                 <CountDown
-                    @endTime="autoclaim ? mbsclaim(mb.asset_id) : null"
+                    @endTime="autoclaim ? emit(mb) : null"
                     :endDate="new Date(mb.next_availability * 1000)">
                     <p slot-scope="data" v-text="data.hour + ':' + data.min + ':' + data.sec"/>
                 </CountDown>
@@ -35,7 +35,9 @@ export default {
             autoclaim: false,
             mbs: {},
             mbsconf: {},
-            refreshTimeOut: null,
+            recentlyEmitedTransaction: false,
+            refreshTimeout: null,
+            refreshTimeoutTransaction: null
         }
     },
     created: function () {
@@ -82,7 +84,7 @@ export default {
             }
         },
 
-        async mbsclaim(assetId) {
+        async mbsclaim(mb) {
             try {
                 const res = await this.$store.state.wax.api.transact({
                 actions: [{
@@ -94,7 +96,7 @@ export default {
                     }], 
                     data: {
                     owner: this.$store.state.wcwName,
-                    asset_id: assetId,
+                    asset_id: mb.assetId,
                     },
                 }]
                 }, {
@@ -111,9 +113,24 @@ export default {
             this.refresh()
         },
 
+        emit(mb) {
+            if(!this.recentlyEmitedTransaction){
+                this.recentlyEmitedTransaction = true
+                this.mbsclaim(mb)
+                this.transactionTimeout()
+            }
+        },
+        
+        transactionTimeout() {
+            clearTimeout(this.refreshTimeoutTransaction)
+            this.refreshTimeoutTransaction = setTimeout(() => {
+                this.recentlyEmitedTransaction = false
+            }, 5000)
+        },
+
         refresh() {
-            clearTimeout(this.refreshTimeOut)
-            this.refreshTimeOut = setTimeout(() => {
+            clearTimeout(this.refreshTimeout)
+            this.refreshTimeout = setTimeout(() => {
                 this.getTables()
                 this.$emit('recover')
             }, 1000)

@@ -9,7 +9,7 @@
                 <img :src="$store.state.path + toolconfs.filter(data => data.template_id === tool.template_id)[0].img">
                 <p>{{getDurability(tool)}}</p>
                 <CountDown
-                    @endTime="autoclaim ? claim(tool.asset_id) : null"
+                    @endTime="autoclaim ? emitClaim(tool) : null"
                     :endDate="new Date(tool.next_availability * 1000)">
                     <p slot-scope="data" v-text="data.hour + ':' + data.min + ':' + data.sec"/>
                 </CountDown>
@@ -35,7 +35,9 @@ export default {
             autoclaim: false,
             tools: {},
             toolconfs: {},
-            refreshTimeOut: null,
+            recentlyEmitedTransaction: false,
+            refreshTimeout: null,
+            refreshTimeoutTransaction: null
         }
     },
     created: function () {
@@ -49,7 +51,7 @@ export default {
 
         getDurability(tool) {
             if (tool.current_durability === 0 && this.autoclaim)
-                this.repair(tool)
+                this.emitRepair(tool)
             return tool.current_durability + '/' + tool.durability
         },
         
@@ -88,7 +90,7 @@ export default {
             }
         },
 
-        async claim(assetId) {
+        async claim(tool) {
             try {
                 const res = await this.$store.state.wax.api.transact({
                 actions: [{
@@ -100,7 +102,7 @@ export default {
                     }], 
                     data: {
                     owner: this.$store.state.wcwName,
-                    asset_id: assetId,
+                    asset_id: tool.asset_id,
                     },
                 }]
                 }, {
@@ -145,9 +147,32 @@ export default {
             } 
         },
 
+        emitClaim(tool) {
+            if(!this.recentlyEmitedTransaction){
+                this.recentlyEmitedTransaction = true
+                this.claim(tool)
+                this.transactionTimeout()
+            }
+        },
+
+        emitRepair(tool) {
+            if(!this.recentlyEmitedTransaction){
+                this.recentlyEmitedTransaction = true
+                this.repair(tool)
+                this.transactionTimeout()
+            }
+        },
+        
+        transactionTimeout() {
+            clearTimeout(this.refreshTimeoutTransaction)
+            this.refreshTimeoutTransaction = setTimeout(() => {
+                this.recentlyEmitedTransaction = false
+            }, 5000)
+        },
+
         refresh() {
-            clearTimeout(this.refreshTimeOut)
-            this.refreshTimeOut = setTimeout(() => {
+            clearTimeout(this.refreshTimeout)
+            this.refreshTimeout = setTimeout(() => {
                 this.getTables()
                 this.$emit('recover')
             }, 1000)

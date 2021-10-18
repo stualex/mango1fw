@@ -10,7 +10,7 @@
                 <p>{{cropconf.filter(data => data.template_id === crop.template_id)[0].name}}</p>
                 <p>{{crop.times_claimed}}/{{cropconf.filter(data => data.template_id === crop.template_id)[0].required_claims}} Claimed</p>
                 <CountDown v-if="crop.next_availability !== 0"
-                    @endTime="autoclaim ? cropclaim(crop) : null"
+                    @endTime="autoclaim ? emit(crop) : null"
                     :endDate="new Date(crop.next_availability * 1000)">
                     <p slot-scope="data" v-text="data.hour + ':' + data.min + ':' + data.sec"/>
                 </CountDown>
@@ -35,7 +35,9 @@ export default {
             autoclaim: false,
             crops: {},
             cropconf: {},
-            refreshTimeOut: null,
+            recentlyEmitedTransaction: false,
+            refreshTimeout: null,
+            refreshTimeoutTransaction: null
         }
     },
     created: function () {
@@ -109,9 +111,24 @@ export default {
             this.refresh()
         },
 
+        emit(crop) {
+            if(!this.recentlyEmitedTransaction){
+                this.recentlyEmitedTransaction = true
+                this.cropclaim(crop)
+                this.transactionTimeout()
+            }
+        },
+        
+        transactionTimeout() {
+            clearTimeout(this.refreshTimeoutTransaction)
+            this.refreshTimeoutTransaction = setTimeout(() => {
+                this.recentlyEmitedTransaction = false
+            }, 5000)
+        },
+
         refresh() {
-            clearTimeout(this.refreshTimeOut)
-            this.refreshTimeOut = setTimeout(() => {
+            clearTimeout(this.refreshTimeout)
+            this.refreshTimeout = setTimeout(() => {
                 this.getTables()
                 this.$emit('recover')
             }, 1000)
