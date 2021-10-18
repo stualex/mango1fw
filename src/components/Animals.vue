@@ -74,7 +74,9 @@ export default {
         hasMats(anm) {
             const anmconf = this.anmconf.filter(e => e.template_id === anm.template_id)[0]
             if (anmconf.consumed_card !== 0) {
-                if(anmconf.consumed_quantity > this.getConsumedItems(anm).length)
+                if(anmconf.consumed_quantity <= this.getConsumedItems(anm).length)
+                    return true
+                else
                     return false
             }
             return true
@@ -200,7 +202,8 @@ export default {
         emit(anm) {
             if(!this.recentlyEmitedTransaction){
                 this.recentlyEmitedTransaction = true
-                if(this.hasMats(anm))
+                const anmconf = this.anmconf.filter(e => e.template_id === anm.template_id)[0]
+                if(this.hasMats(anm) && anmconf.consumed_card !== 0)
                     this.anmclaimburn(anm, this.getConsumedItems(anm)[0])
                 else
                     this.anmclaim(anm)
