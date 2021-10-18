@@ -1,6 +1,6 @@
 <template>
   <div>
-    <slot :hour="hour" :min="min" :sec="sec"></slot>
+    <slot id="countdown" :hour="hour" :min="min" :sec="sec"></slot>
   </div>
 </template>
 
@@ -12,55 +12,39 @@ export default {
       default(){
         return new Date()
       }
-    },
-    negative : {  // optional, should countdown after 0 to negative
-      type : Boolean,
-      default : false
     }
   },
-  data(){
-    return{
+  data() {
+    return {
       now : new Date(),
-      timer : null
+      hour: null,
+      min: null,
+      sec: null,
     }
   },
-  computed:{
-    hour(){
-      let h = Math.trunc((this.endDate - this.now) / 1000 / 3600);
-      return h>9?h:'0'+h;
-    },
-    min(){
-      let m = Math.trunc((this.endDate - this.now) / 1000 / 60) % 60;
-      return m>9?m:'0'+m;
-    },
-    sec(){
-      let s = Math.trunc((this.endDate - this.now)/1000) % 60
-      return s>9?s:'0'+s;
-    }
-  },
-  watch : {
-    endDate : {
-      immediate : true,
-      handler(newVal){
-        if(this.timer)
-          clearInterval(this.timer)
-        this.timer = setInterval(()=>{
-          this.now = new Date()
-          if(this.negative)
-            return
-          //Envoyer un emit au 5 secondes pour ne pas oversend des requetes au api
-          if(this.now > newVal && this.now % 5 === 0){
-            this.$emit('endTime')
-            //On veut qui refasse tant qu'il n'est pas claim
-            //this.now = newVal
-            //clearInterval(this.timer)
-          }
-        }, 1000)
-      }
-    }
+  created: function () {
+    this.showTime()
   },
   beforeDestroy(){
-    clearInterval(this.timer)
+    cancelAnimationFrame(this.showTime)
+  },
+  methods: {
+    // show time repeatedly
+    showTime() {
+      this.now = new Date()
+      let h = Math.trunc((this.endDate - this.now) / 1000 / 3600);
+      this.hour = h>9?h:'0'+h
+      let m = Math.trunc((this.endDate - this.now) / 1000 / 60) % 60;
+      this.min = m>9?m:'0'+m;
+      let s = Math.trunc((this.endDate - this.now)/1000) % 60
+      this.sec = s>9?s:'0'+s;
+
+      if (this.now > this.endDate) {
+        this.$emit('endTime')
+      }
+
+      requestAnimationFrame(this.showTime);
+    }
   }
 }
 </script>

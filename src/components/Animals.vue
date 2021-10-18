@@ -59,9 +59,9 @@ export default {
             const now = new Date()
             const firstclaim = new Date(anm.day_claims_at[0] * 1000)
 
-            if (anm.day_claims_at.length === anmconf.daily_claim_limit && now.getUTCDay() !== firstclaim.getUTCDay())
-                return false
-            return true
+            if ((anm.day_claims_at.length === anmconf.daily_claim_limit && now.getUTCDay() !== firstclaim.getUTCDay()) || anm.time_claimed !== 0)
+                return true
+            return false
         },
 
         getConsumedItems(anm){
@@ -212,7 +212,7 @@ export default {
             clearTimeout(this.refreshTimeoutTransaction)
             this.refreshTimeoutTransaction = setTimeout(() => {
                 this.recentlyEmitedTransaction = false
-            }, 10000)
+            }, 15000)
         },
 
         refresh() {
