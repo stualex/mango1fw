@@ -10,11 +10,11 @@
                 <p>{{anm.name}}</p>
                 <p>{{anm.times_claimed}}/{{anmconf.filter(e => e.template_id === anm.template_id)[0].required_claims}} Claimed</p>
                 <CountDown
-                    @endTime="autoclaim && hasDailyClaimed(anm) && hasMats(anm) ? emit(anm) : null"
+                    @endTime="autoclaim && !hasDailyClaimed(anm) && hasMats(anm) ? emit(anm) : null"
                     :endDate="new Date(anm.next_availability * 1000)">
                     <p slot-scope="data" v-text="data.hour + ':' + data.min + ':' + data.sec"/>
                 </CountDown>
-                <p v-if="!hasDailyClaimed(anm)" v-bind:class="{error : anm.next_availability !== 0}">Daily claim reached</p>
+                <p v-if="hasDailyClaimed(anm)" v-bind:class="{error : anm.next_availability !== 0}">Daily claim reached</p>
                 <p v-if="!hasMats(anm)" v-bind:class="{error : anm.next_availability !== 0}">Missing {{anmconf.filter(e => e.template_id === anm.template_id)[0].consumed_quantity}} {{itemconf.filter(e => e.template_id === anmconf.filter(e => e.template_id === anm.template_id)[0].consumed_card)[0].name}}</p>
             </div>
         </div>
@@ -59,7 +59,7 @@ export default {
             const now = new Date()
             const firstclaim = new Date(anm.day_claims_at[0] * 1000)
 
-            if ((anm.day_claims_at.length === anmconf.daily_claim_limit && now.getUTCDay() !== firstclaim.getUTCDay()) || anm.time_claimed !== 0)
+            if ((anm.day_claims_at.length === anmconf.daily_claim_limit && now.getUTCDay() !== firstclaim.getUTCDay() && anm.times_claimed >= anmconf.daily_claim_limit))
                 return true
             return false
         },
