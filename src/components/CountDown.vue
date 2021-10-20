@@ -44,7 +44,6 @@ export default {
         this.timer = setInterval(()=>{
           this.now = new Date()
           if(this.now > newVal){
-            this.now = newVal
             this.$emit('endTime')
           }
         }, 1000)
