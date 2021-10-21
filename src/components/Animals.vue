@@ -58,8 +58,10 @@ export default {
 
             const now = new Date()
             const firstclaim = new Date(anm.day_claims_at[0] * 1000)
+            //console.log(anm.name)
+            //console.log("anm.times_claimed", anm.times_claimed, "anmconf.daily_claim_limit", anmconf.daily_claim_limit, "Now", now.getUTCDay(), "First Claim", firstclaim.getUTCDay())
 
-            if ((anm.day_claims_at.length === anmconf.daily_claim_limit && now.getUTCDay() !== firstclaim.getUTCDay() && anm.times_claimed >= anmconf.daily_claim_limit))
+            if (anm.times_claimed >= anmconf.daily_claim_limit && now.getUTCDay() === firstclaim.getUTCDay())
                 return true
             return false
         },
