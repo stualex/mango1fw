@@ -3,12 +3,12 @@
     <Header title="Farmers World" @btnClick="btnClick" :loggedIn="loggedIn" />
     <div v-if="loggedIn">
       <Resources :hasTransactionEmited="hasTransactionEmited" @energyRefreshed="energyRefreshed"/>
-      <Tools @recover="recover" />
-      <Memberships @recover="recover" />
-      <Buildings @recover="recover" />
-      <Animals @recover="recover" />
-      <Crops @recover="recover" /> 
-      <Items /> 
+      <Tools @recover="getEnergy" />
+      <Memberships @recover="getEnergy" @newItem="getNewItem" />
+      <Buildings @recover="getEnergy" />
+      <Animals @recover="getEnergy" @newItem="getNewItem" />
+      <Crops @recover="getEnergy" @newItem="getNewItem" /> 
+      <Items :hasNewItem="hasNewItem" @itemsRefreshed="itemsRefreshed" /> 
     </div>
     <Footer />
   </div>
@@ -41,6 +41,7 @@ export default {
   data() {
     return {
       loggedIn: false,
+      hasNewItem: false,
       hasTransactionEmited: false
     }
   },
@@ -93,12 +94,20 @@ export default {
       this.loggedIn = false
     },
 
-    recover() {
+    getEnergy() {
       this.hasTransactionEmited = true
+    },
+
+    getNewItem() {
+      this.hasNewItem = true
     },
 
     energyRefreshed() {
       this.hasTransactionEmited = false
+    },
+    
+    itemsRefreshed() {
+      this.hasNewItem = false
     }
   },
 }

@@ -16,7 +16,8 @@
 <script>
 export default {
     name: 'Items',
-    components: {
+    props: {
+        hasNewItem: false,
     },
     data() {
         return {
@@ -27,6 +28,14 @@ export default {
     },
     created: function () {
         this.getTables()
+    },
+    watch: {
+        hasNewItem : function () {
+            if(this.hasNewItem){
+                this.refresh()
+                this.$emit('itemsRefreshed')
+            }
+        }
     },
     methods: {
         
@@ -68,7 +77,7 @@ export default {
 
                 this.items = items
             } catch (e) {
-                console.log(e)
+                this.$toast(e.message)
             }
         },
 

@@ -15,7 +15,7 @@ Vue.use(Toast, {
   maxToasts: 20,
   newestOnTop: true,
   position: "top-right",
-  timeout: 10000,
+  timeout: 15000,
   closeOnClick: true,
   pauseOnFocusLoss: true,
   pauseOnHover: true,

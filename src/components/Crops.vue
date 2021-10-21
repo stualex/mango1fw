@@ -80,7 +80,7 @@ export default {
                 })
                 this.crops = cropsTable.rows
             } catch (e) {
-                console.log(e)
+                this.$toast(e.message)
             }
         },
 
@@ -106,7 +106,7 @@ export default {
                 
                 this.$toast(crop.name + ' Claimed')
             } catch(e) { 
-                console.log(e)
+                this.$toast(e.message)
             } 
             this.refresh()
         },
@@ -131,6 +131,7 @@ export default {
             this.refreshTimeout = setTimeout(() => {
                 this.getTables()
                 this.$emit('recover')
+                this.$emit('newItem')
             }, 1000)
         },
     }

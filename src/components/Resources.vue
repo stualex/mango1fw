@@ -67,7 +67,7 @@ export default {
                 })
                 this.account = accountTable.rows[0]
             } catch (e) {
-                console.log(e)
+                this.$toast(e.message)
             }
         },
 
@@ -94,7 +94,7 @@ export default {
                 console.log(res)
                 this.$toast('Recovered ' + amount + ' energy')
             } catch(e) { 
-                console.log(e)
+                this.$toast(e.message)
             } 
             this.refresh()
         },

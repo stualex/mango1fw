@@ -80,7 +80,7 @@ export default {
                 })
                 this.mbs = mbsTable.rows
             } catch (e) {
-                console.log(e)
+                this.$toast(e.message)
             }
         },
 
@@ -109,7 +109,7 @@ export default {
                 const logbonus = res.processed.action_traces.filter(e => e.receiver === "farmersworld")[0].inline_traces.filter(e => e.receiver === "farmersworld").filter(e => e.act.name === "logbonus")[0].act.data.bonus_rewards[0]
                 this.$toast(<div>Claimed {logmbsclaim} Farmer Coins<br />Bonus {logbonus}</div>)
             } catch(e) { 
-                console.log(e)
+                this.$toast(e.message)
             } 
             this.refresh()
         },
@@ -134,6 +134,7 @@ export default {
             this.refreshTimeout = setTimeout(() => {
                 this.getTables()
                 this.$emit('recover')
+                this.$emit('newItem')
             }, 1000)
         },
     }

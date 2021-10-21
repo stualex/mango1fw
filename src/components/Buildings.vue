@@ -80,7 +80,7 @@ export default {
                 })
                 this.buildings = buildingsTable.rows
             } catch (e) {
-                console.log(e)
+                this.$toast(e.message)
             }
         },
 
@@ -106,7 +106,7 @@ export default {
                 
                 this.$toast(bld.name + ' claimed')
             } catch(e) { 
-                console.log(e)
+                this.$toast(e.message)
             } 
             this.refresh()
         },

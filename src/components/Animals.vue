@@ -141,7 +141,7 @@ export default {
                 })
                 this.items = items
             } catch (e) {
-                console.log(e)
+                this.$toast(e.message)
             }
         },
 
@@ -164,10 +164,9 @@ export default {
                     blocksBehind: 3,
                     expireSeconds: 1200,
                 })
-                console.log(res)
                 this.$toast(anm.name + ' Claimed')
             } catch(e) { 
-                console.log(e)
+                this.$toast(e.message)
             } 
             this.refresh()
         },
@@ -193,10 +192,9 @@ export default {
                     blocksBehind: 3,
                     expireSeconds: 1200,
                 })
-                console.log(res)
                 this.$toast(<div>{anm.name} Claimed<br />{item.name} Burned</div>)
             } catch(e) { 
-                console.log(e)
+                this.$toast(e.message)
             } 
             this.refresh()
         },
@@ -225,6 +223,7 @@ export default {
             this.refreshTimeOut = setTimeout(() => {
                 this.getTables()
                 this.$emit('recover')
+                this.$emit('newItem')
             }, 1000)
         },
     },

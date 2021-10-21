@@ -7,7 +7,7 @@
         <div class="tools">
             <div class="tool" :key="tool.asset_id" v-for="tool in tools">
                 <img :src="$store.state.path + toolconfs.filter(data => data.template_id === tool.template_id)[0].img">
-                <p>{{getDurability(tool)}}</p>
+                <p>{{showDurability(tool)}}</p>
                 <CountDown
                     @endTime="autoclaim ? emitClaim(tool) : null"
                     :endDate="new Date(tool.next_availability * 1000)">
@@ -49,7 +49,7 @@ export default {
             this.autoclaim = bool
         },
 
-        getDurability(tool) {
+        showDurability(tool) {
             if (tool.current_durability === 0 && this.autoclaim)
                 this.emitRepair(tool)
             return tool.current_durability + '/' + tool.durability
@@ -86,7 +86,7 @@ export default {
                 })
                 this.tools = toolsTable.rows
             } catch (e) {
-                console.log(e)
+                this.$toast(e.message)
             }
         },
 
@@ -110,13 +110,12 @@ export default {
                     expireSeconds: 1200,
                 })
 
-                console.log(res)
                 const logclaim = res.processed.action_traces.filter(e => e.receiver === "farmersworld")[0].inline_traces.filter(e => e.receiver === "farmersworld").filter(e => e.act.name === "logclaim")[0].act.data.rewards[0]
                 const logbonus = res.processed.action_traces.filter(e => e.receiver === "farmersworld")[0].inline_traces.filter(e => e.receiver === "farmersworld").filter(e => e.act.name === "logbonus")[0].act.data.bonus_rewards[0]
                 this.$toast(<div>Claimed {logclaim}<br />Bonus {logbonus}</div>)
                 this.refresh()
             } catch(e) { 
-                console.log(e)
+                this.$toast(e.message)
             }
         },
 
@@ -143,7 +142,7 @@ export default {
                 this.$toast(this.toolconfs.filter(e => e.template_id === tool.template_id)[0].template_name + ' Repaired')
                 this.refresh()
             } catch(e) { 
-                console.log(e)
+                this.$toast(e.message)
             } 
         },
 
