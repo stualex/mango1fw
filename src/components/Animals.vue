@@ -57,11 +57,15 @@ export default {
             const anmconf = this.anmconf.filter(e => e.template_id === anm.template_id)[0]
 
             const now = new Date()
-            const firstclaim = new Date(anm.day_claims_at[0] * 1000)
-            //console.log(anm.name)
-            //console.log("anm.times_claimed", anm.times_claimed, "anmconf.daily_claim_limit", anmconf.daily_claim_limit, "Now", now.getUTCDay(), "First Claim", firstclaim.getUTCDay())
+            const firstclaim = new Date(anm.day_claims_at.reduce(function (pre, cur) {
+                    return Date.parse(pre) > Date.parse(cur) ? cur : pre }) * 1000)
 
-            if (anm.times_claimed >= anmconf.daily_claim_limit && now.getUTCDay() === firstclaim.getUTCDay())
+            //const firstclaim = new Date(anm.day_claims_at[0] * 1000)
+            //console.log(anm.name, anm, anmconf)
+            //console.log("anm.times_claimed", anm.times_claimed, "anmconf.daily_claim_limit", anmconf.daily_claim_limit, "Now", now.getUTCDay(), "First Claim", firstclaim.getUTCDay())
+            //console.log(now.getTime(), firstclaim.getTime())
+
+            if (anm.times_claimed >= anmconf.daily_claim_limit && now.getTime() >= firstclaim.getTime())
                 return true
             return false
         },

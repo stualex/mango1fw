@@ -65,7 +65,6 @@ export default {
                     "show_payer": false
                 })
                 this.mbsconf = mbsconfTable.rows
-        
                 const mbsTable = await this.$store.state.wax.api.rpc.get_table_rows({
                     "json": true, 
                     "code": "farmersworld", 
@@ -85,7 +84,6 @@ export default {
         },
 
         async mbsclaim(mb) {
-            console.log(mb)
             try {
                 const res = await this.$store.state.wax.api.transact({
                 actions: [{
@@ -104,7 +102,6 @@ export default {
                     blocksBehind: 3,
                     expireSeconds: 1200,
                 })
-                
                 const logmbsclaim = res.processed.action_traces.filter(e => e.receiver === "farmersworld")[0].inline_traces.filter(e => e.receiver === "farmersworld").filter(e => e.act.name === "logmbsclaim")[0].act.data.amounts[0]
                 const logbonus = res.processed.action_traces.filter(e => e.receiver === "farmersworld")[0].inline_traces.filter(e => e.receiver === "farmersworld").filter(e => e.act.name === "logbonus")[0].act.data.bonus_rewards[0]
                 this.$toast(<div>Claimed {logmbsclaim} Farmer Coins<br />Bonus {logbonus}</div>)

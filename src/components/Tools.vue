@@ -109,7 +109,6 @@ export default {
                     blocksBehind: 3,
                     expireSeconds: 1200,
                 })
-
                 const logclaim = res.processed.action_traces.filter(e => e.receiver === "farmersworld")[0].inline_traces.filter(e => e.receiver === "farmersworld").filter(e => e.act.name === "logclaim")[0].act.data.rewards[0]
                 const logbonus = res.processed.action_traces.filter(e => e.receiver === "farmersworld")[0].inline_traces.filter(e => e.receiver === "farmersworld").filter(e => e.act.name === "logbonus")[0].act.data.bonus_rewards[0]
                 this.$toast(<div>Claimed {logclaim}<br />Bonus {logbonus}</div>)
@@ -138,7 +137,6 @@ export default {
                 blocksBehind: 3,
                 expireSeconds: 1200,
                 })
-                console.log(res)
                 this.$toast(this.toolconfs.filter(e => e.template_id === tool.template_id)[0].template_name + ' Repaired')
                 this.refresh()
             } catch(e) { 
