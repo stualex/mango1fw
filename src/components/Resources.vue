@@ -91,7 +91,6 @@ export default {
                     expireSeconds: 1200,
                 })
 
-                console.log(res)
                 this.$toast('Recovered ' + amount + ' energy')
             } catch(e) { 
                 this.$toast(e.message)
