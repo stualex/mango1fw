@@ -1,6 +1,6 @@
 <template>
   <div class="container" id="account">
-    <Header title="Farmers World" @btnClick="btnClick" :loggedIn="loggedIn" />
+    <Header title="Farmers World" @btnRelog="relog" @btnClick="btnClick" :loggedIn="loggedIn" />
     <div v-if="loggedIn">
       <Resources :hasTransactionEmited="hasTransactionEmited" @energyRefreshed="energyRefreshed"/>
       <Tools @recover="getEnergy" />
@@ -86,6 +86,12 @@ export default {
       } catch(e) { 
         console.log(e)
       } 
+    },
+
+    relog() {
+      this.$store.commit('setWax', null)
+      this.$store.commit('setWcwName', null)
+      this.autoLogin()
     },
 
     logout() {

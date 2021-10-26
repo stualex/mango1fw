@@ -107,14 +107,14 @@ export default {
                 this.$toast(<div>Claimed {logmbsclaim} Farmer Coins<br />Bonus {logbonus}</div>)
             } catch(e) { 
                 this.$toast(e.message)
-            } 
-            this.refresh()
+            }
         },
 
         emit(mb) {
             if(!this.recentlyEmitedTransaction){
                 this.recentlyEmitedTransaction = true
                 this.mbsclaim(mb)
+                this.refresh()
                 this.transactionTimeout()
             }
         },

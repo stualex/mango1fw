@@ -58,7 +58,7 @@ export default {
 
             const now = new Date()
             const firstclaim = new Date(anm.day_claims_at.reduce(function (pre, cur) {
-                    return Date.parse(pre) > Date.parse(cur) ? cur : pre }) * 1000)
+                    return Date.parse(pre) < Date.parse(cur) ? cur : pre }) * 1000)
 
             //const firstclaim = new Date(anm.day_claims_at[0] * 1000)
             //console.log(anm.name, anm, anmconf)
@@ -171,8 +171,7 @@ export default {
                 this.$toast(anm.name + ' Claimed')
             } catch(e) { 
                 this.$toast(e.message)
-            } 
-            this.refresh()
+            }
         },
 
         async anmclaimburn(anm, item) {
@@ -199,8 +198,7 @@ export default {
                 this.$toast(<div>{anm.name} Claimed<br />{item.name} Burned</div>)
             } catch(e) { 
                 this.$toast(e.message)
-            } 
-            this.refresh()
+            }
         },
 
         emit(anm) {
@@ -211,6 +209,7 @@ export default {
                     this.anmclaimburn(anm, this.getConsumedItems(anm)[0])
                 else
                     this.anmclaim(anm)
+                this.refresh()
                 this.transactionTimeout()
             }
         },

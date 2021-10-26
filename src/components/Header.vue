@@ -2,6 +2,8 @@
   <header>
     <h1 v-if="loggedIn">Farmer {{ $store.state.wcwName }}</h1>
     <h1 v-else>{{ title }}</h1>
+    <Button @btn-click="$emit('btnRelog')"
+      :text="'Relog'" />
     <Button @btn-click="$emit('btnClick')"
       :text="loggedIn ? 'Logout' : 'Login'"
       :color="loggedIn ? 'red' : 'green'"

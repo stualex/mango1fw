@@ -107,14 +107,14 @@ export default {
                 this.$toast(bld.name + ' claimed')
             } catch(e) { 
                 this.$toast(e.message)
-            } 
-            this.refresh()
+            }
         },
 
         emit(bld) {
             if(!this.recentlyEmitedTransaction){
                 this.recentlyEmitedTransaction = true
                 this.bldclaim(bld)
+                this.refresh()
                 this.transactionTimeout()
             }
         },

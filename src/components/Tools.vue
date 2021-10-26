@@ -112,9 +112,9 @@ export default {
                 const logclaim = res.processed.action_traces.filter(e => e.receiver === "farmersworld")[0].inline_traces.filter(e => e.receiver === "farmersworld").filter(e => e.act.name === "logclaim")[0].act.data.rewards[0]
                 const logbonus = res.processed.action_traces.filter(e => e.receiver === "farmersworld")[0].inline_traces.filter(e => e.receiver === "farmersworld").filter(e => e.act.name === "logbonus")[0].act.data.bonus_rewards[0]
                 this.$toast(<div>Claimed {logclaim}<br />Bonus {logbonus}</div>)
-                this.refresh()
             } catch(e) { 
-                this.$toast(e.message)
+                //{"errors":[{"error_type":"Request validation error","message":"Session token required in header","error_code":"0"}]}
+                console.log(e)
             }
         },
 
@@ -138,16 +138,16 @@ export default {
                 expireSeconds: 1200,
                 })
                 this.$toast(this.toolconfs.filter(e => e.template_id === tool.template_id)[0].template_name + ' Repaired')
-                this.refresh()
             } catch(e) { 
-                this.$toast(e.message)
-            } 
+                console.log(e)
+            }
         },
 
         emitClaim(tool) {
             if(!this.recentlyEmitedTransaction){
                 this.recentlyEmitedTransaction = true
                 this.claim(tool)
+                this.refresh()
                 this.transactionTimeout()
             }
         },
@@ -156,6 +156,7 @@ export default {
             if(!this.recentlyEmitedTransaction){
                 this.recentlyEmitedTransaction = true
                 this.repair(tool)
+                this.refresh()
                 this.transactionTimeout()
             }
         },

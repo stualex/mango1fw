@@ -103,18 +103,17 @@ export default {
                     blocksBehind: 3,
                     expireSeconds: 1200,
                 })
-                
                 this.$toast(crop.name + ' Claimed')
             } catch(e) { 
                 this.$toast(e.message)
             } 
-            this.refresh()
         },
 
         emit(crop) {
             if(!this.recentlyEmitedTransaction){
                 this.recentlyEmitedTransaction = true
                 this.cropclaim(crop)
+                this.refresh()
                 this.transactionTimeout()
             }
         },
