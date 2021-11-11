@@ -49,8 +49,9 @@ export default {
 
         getEnergy(){
             if ((this.account.energy / this.account.max_energy) < 0.20) {
-                const foodValueInEnergy = this.getResourceValue(this.account.balances[2]) * 5
+                const foodValueInEnergy = Math.trunc(this.getResourceValue(this.account.balances[2]) * 5)
                 const energyNeeded = Math.trunc(this.account.max_energy - this.account.energy)
+                console.log('Can fill completely?', foodValueInEnergy > energyNeeded)
                 
                 if (foodValueInEnergy < energyNeeded)
                     this.emit(foodValueInEnergy)
