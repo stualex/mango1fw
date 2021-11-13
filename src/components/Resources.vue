@@ -49,15 +49,8 @@ export default {
 
         getEnergy(){
             if ((this.account.energy / this.account.max_energy) < 0.20) {
-                const foodValueInEnergy = Math.trunc(this.getResourceValue(this.account.balances[2]) * 5)
-                const energyNeeded = Math.trunc(this.account.max_energy - this.account.energy)
-                console.log('Can fill completely?', foodValueInEnergy > energyNeeded)
-                
-                if (foodValueInEnergy !== 0)
-                    if (foodValueInEnergy < energyNeeded)
-                        this.emit(foodValueInEnergy / 5)
-                    else
-                        this.emit(energyNeeded)
+                const amount = Math.trunc(this.account.max_energy - this.account.energy)
+                this.emit(amount)
             }
             return this.account.energy + '/' + this.account.max_energy
         },
