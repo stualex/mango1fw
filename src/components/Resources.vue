@@ -53,10 +53,11 @@ export default {
                 const energyNeeded = Math.trunc(this.account.max_energy - this.account.energy)
                 console.log('Can fill completely?', foodValueInEnergy > energyNeeded)
                 
-                if (foodValueInEnergy < energyNeeded)
-                    this.emit(foodValueInEnergy / 5)
-                else
-                    this.emit(energyNeeded)
+                if (foodValueInEnergy !== 0)
+                    if (foodValueInEnergy < energyNeeded)
+                        this.emit(foodValueInEnergy / 5)
+                    else
+                        this.emit(energyNeeded)
             }
             return this.account.energy + '/' + this.account.max_energy
         },
