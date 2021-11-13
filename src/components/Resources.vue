@@ -54,7 +54,7 @@ export default {
                 console.log('Can fill completely?', foodValueInEnergy > energyNeeded)
                 
                 if (foodValueInEnergy < energyNeeded)
-                    this.emit(foodValueInEnergy)
+                    this.emit(foodValueInEnergy / 5)
                 else
                     this.emit(energyNeeded)
             }
