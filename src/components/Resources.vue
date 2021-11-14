@@ -49,20 +49,13 @@ export default {
 
         getEnergy(){
             if ((this.account.energy / this.account.max_energy) < 0.20) {
-                console.log("account", this.account, "food", this.account.balances[2])
-                const foodValue = this.getResourceValue(this.account.balances[2])
-                const foodValueInEnergy = foodValue * 5
+                const foodValueInEnergy = this.getResourceValue(this.account.balances[1]) * 5
                 const energyNeeded = Math.trunc(this.account.max_energy - this.account.energy)
-                console.log("Food", foodValue, "Food to Energy", foodValueInEnergy, "Energy Needed", energyNeeded)
                 
-                if (foodValueInEnergy < energyNeeded) {
-                    console.log("emit food value in wallet")
+                if (foodValueInEnergy < energyNeeded) 
                     this.emit(foodValueInEnergy)
-                }
-                else {
-                    console.log("emit max energy")
+                else
                     this.emit(energyNeeded)
-                }
             }
             return this.account.energy + '/' + this.account.max_energy
         },
