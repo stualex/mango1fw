@@ -5,8 +5,10 @@ import router from './router'
 
 import * as waxjs from "@waxio/waxjs/dist"
 
-import Toast from "vue-toastification";
-import "vue-toastification/dist/index.css";
+import Toast from "vue-toastification"
+import "vue-toastification/dist/index.css"
+
+import VueGtag from "vue-gtag"
 
 Vue.use(Vuex)
 
@@ -26,6 +28,10 @@ Vue.use(Toast, {
   closeButton: "button",
   icon: true,
   rtl: false
+})
+
+Vue.use(VueGtag, {
+  config: { id: "G-5DHGWB2J8T" }
 })
 
 Vue.config.productionTip = false
