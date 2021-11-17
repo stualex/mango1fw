@@ -5,13 +5,18 @@ import Home from '@/views/Home.vue'
 Vue.use(VueRouter)
 
 const routes = [
-  {
+  /*{
     path: '/',
     name: 'Home',
     component: Home
+  },*/
+  {
+    path: '/farmersworld',
+    name: 'FarmersWorld',
+    component: () => import('@/views/FarmersWorld.vue')
   },
   {
-    path: '/about',
+    path: '/',
     name: 'About',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
@@ -21,6 +26,7 @@ const routes = [
 ]
 
 const router = new VueRouter({
+  mode: 'history',
   routes
 })
 

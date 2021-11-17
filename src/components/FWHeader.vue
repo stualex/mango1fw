@@ -2,8 +2,8 @@
   <header>
     <h1 v-if="loggedIn">Farmer {{ $store.state.wcwName }}</h1>
     <h1 v-else>{{ title }}</h1>
-    <Button @btn-click="$emit('btnRelog')"
-      :text="'Relog'" />
+    <!-- Comment <Button @btn-click="$emit('btnRelog')"
+      :text="'Relog'" /> --> 
     <Button @btn-click="$emit('btnClick')"
       :text="loggedIn ? 'Logout' : 'Login'"
       :color="loggedIn ? 'red' : 'green'"
@@ -15,7 +15,7 @@
 import Button from './Button.vue'
 
 export default {
-  name: 'Header',
+  name: 'FWHeader',
   props: {
     title: String,
     loggedIn: Boolean
