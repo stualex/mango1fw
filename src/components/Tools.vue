@@ -59,33 +59,36 @@ export default {
         async getTables() {
             try {
                 const toolconfsTable = await this.$store.state.wax.api.rpc.get_table_rows({
-                "json": true,
-                "code": "farmersworld",
-                "scope": "farmersworld",
-                "table": "toolconfs",
-                "lower_bound": "",
-                "upper_bound": "",
-                "index_position": 1,
-                "key_type": "",
-                "limit": 100,
-                "reverse": false,
-                "show_payer": false
+                    "json": true,
+                    "code": "farmersworld",
+                    "scope": "farmersworld",
+                    "table": "toolconfs",
+                    "lower_bound": "",
+                    "upper_bound": "",
+                    "index_position": 1,
+                    "key_type": "",
+                    "limit": 100,
+                    "reverse": false,
+                    "show_payer": false
                 })
                 this.toolconfs = toolconfsTable.rows
 
                 const toolsTable = await this.$store.state.wax.api.rpc.get_table_rows({
-                "json": true, 
-                "code": "farmersworld", 
-                "scope": "farmersworld", 
-                "table": "tools",
-                "lower_bound": this.$store.state.wcwName, 
-                "upper_bound": this.$store.state.wcwName, 
-                "index_position": 2,
-                "key_type": "i64",
-                "reverse": false,
-                "show_payer": false,
+                    "json": true, 
+                    "code": "farmersworld", 
+                    "scope": "farmersworld", 
+                    "table": "tools",
+                    "lower_bound": this.$store.state.wcwName, 
+                    "upper_bound": this.$store.state.wcwName, 
+                    "index_position": 2,
+                    "key_type": "i64",
+                    "limit": 100,
+                    "reverse": false,
+                    "show_payer": false,
                 })
                 this.tools = toolsTable.rows
+
+                console.log(toolsTable)
             } catch (e) {
                 this.$toast(e.message)
             }
