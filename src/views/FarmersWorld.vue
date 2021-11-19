@@ -10,20 +10,18 @@
       <Crops @recover="getEnergy" @newItem="getNewItem" /> 
       <Items :hasNewItem="hasNewItem" @itemsRefreshed="itemsRefreshed" /> 
     </div>
-    <Footer />
   </div>
 </template>
 
 <script>
-import FWHeader from '@/components/FWHeader.vue'
-import Resources from '@/components/Resources.vue'
-import Tools from '@/components/Tools.vue'
-import Memberships from '@/components/Memberships.vue'
-import Buildings from '@/components/Buildings.vue'
-import Animals from '@/components/Animals.vue'
-import Crops from '@/components/Crops.vue'
-import Items from '@/components/Items.vue'
-import Footer from '@/components/Footer.vue'
+import FWHeader from '@/components/farmersworld/FWHeader.vue'
+import Resources from '@/components/farmersworld/Resources.vue'
+import Tools from '@/components/farmersworld/Tools.vue'
+import Memberships from '@/components/farmersworld/Memberships.vue'
+import Buildings from '@/components/farmersworld/Buildings.vue'
+import Animals from '@/components/farmersworld/Animals.vue'
+import Crops from '@/components/farmersworld/Crops.vue'
+import Items from '@/components/farmersworld/Items.vue'
 
 export default {
   name: 'FarmersWorld',
@@ -36,7 +34,6 @@ export default {
     Animals,
     Crops,
     Items,
-    Footer,
   },
   data() {
     return {
