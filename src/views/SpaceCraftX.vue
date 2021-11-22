@@ -1,27 +1,17 @@
 <template>
   <div class="container" id="account">
-    <LoginHeader title="Farmer" @btnRelog="relog" @btnClick="btnClick" :loggedIn="loggedIn" />
+    <LoginHeader title="Space Miner" @btnRelog="relog" @btnClick="btnClick" :loggedIn="loggedIn" />
     <div v-if="loggedIn">
       <Resources :hasTransactionEmited="hasTransactionEmited" @energyRefreshed="energyRefreshed"/>
       <Tools @recover="getEnergy" />
-      <Memberships @recover="getEnergy" @newItem="getNewItem" />
-      <Buildings @recover="getEnergy" />
-      <Animals @recover="getEnergy" @newItem="getNewItem" />
-      <Crops @recover="getEnergy" @newItem="getNewItem" /> 
-      <Items :hasNewItem="hasNewItem" @itemsRefreshed="itemsRefreshed" /> 
     </div>
   </div>
 </template>
 
 <script>
 import LoginHeader from '@/components/LoginHeader.vue'
-import Resources from '@/components/farmersworld/Resources.vue'
-import Tools from '@/components/farmersworld/Tools.vue'
-import Memberships from '@/components/farmersworld/Memberships.vue'
-import Buildings from '@/components/farmersworld/Buildings.vue'
-import Animals from '@/components/farmersworld/Animals.vue'
-import Crops from '@/components/farmersworld/Crops.vue'
-import Items from '@/components/farmersworld/Items.vue'
+import Resources from '@/components/spacecraftx/Resources.vue'
+import Tools from '@/components/spacecraftx/Tools.vue'
 
 export default {
   name: 'FarmersWorld',
@@ -29,11 +19,6 @@ export default {
     LoginHeader,
     Resources,
     Tools,
-    Memberships,
-    Buildings,
-    Animals,
-    Crops,
-    Items,
   },
   data() {
     return {

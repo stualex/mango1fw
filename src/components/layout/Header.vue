@@ -4,7 +4,8 @@
         <div id="nav">
             <!-- <router-link to="/">Home</router-link> | --> 
             <router-link to="/">About</router-link> |
-            <router-link to="/farmersworld">Farmers World</router-link>
+            <router-link to="/farmersworld">Farmers World</router-link> |
+            <router-link to="/spacecraftx">Space Craft X</router-link>
         </div>
     </header>
 </template>

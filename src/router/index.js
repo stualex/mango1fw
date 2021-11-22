@@ -16,6 +16,11 @@ const routes = [
     component: () => import('@/views/FarmersWorld.vue')
   },
   {
+    path: '/spacecraftx',
+    name: 'SpaceCraftX',
+    component: () => import('@/views/SpaceCraftX.vue')
+  },
+  {
     path: '/',
     name: 'About',
     // route level code-splitting
@@ -29,5 +34,10 @@ const router = new VueRouter({
   //mode: 'history',
   routes
 })
+
+router.beforeEach((to, from, next) => {
+  document.title = to.name;
+  next();
+});
 
 export default router
