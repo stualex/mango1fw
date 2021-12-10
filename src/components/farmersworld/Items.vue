@@ -66,7 +66,7 @@ export default {
                 })
                 
                 //Get FW Items
-                const res = await fetch('https://wax.api.atomicassets.io/atomicassets/v1/assets?page=1&limit=1000&collection_name=farmersworld&owner=' + this.$store.state.wcwName)
+                const res = await fetch('https://wax.api.atomicassets.io/atomicassets/v1/assets?page=1&limit=5000&collection_name=farmersworld&owner=' + this.$store.state.wcwName)
                 const results = await res.json()
 
                 const items = []
