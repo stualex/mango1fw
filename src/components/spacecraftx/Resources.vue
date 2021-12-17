@@ -87,6 +87,7 @@ export default {
         },
 
         async recover(amount) {
+            let amountFloor = Math.floor(amount / 10)
             try {
                 const res = await this.$store.state.wax.api.transact({
                 actions: [{
@@ -98,14 +99,14 @@ export default {
                     }], 
                     data: {
                         owner: this.$store.state.wcwName,
-                        waves_payment: amount / 10,
+                        waves_payment: amountFloor,
                     },
                 }]
                 }, {
                     blocksBehind: 3,
                     expireSeconds: 1200,
                 })
-                this.$toast('Recovered ' + amount + ' energy')
+                this.$toast('Recovered ' + amountFloor + ' energy')
             } catch(e) { 
                 this.$toast(e.message)
             } 
