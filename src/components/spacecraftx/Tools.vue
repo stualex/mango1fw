@@ -59,8 +59,7 @@ export default {
 
         getNextAvailability(tool){
             //Add Z for UTC
-            const next_availability = new Date(Date.parse(tool.last_claim_time+'Z'))
-            next_availability.setHours(next_availability.getHours() + 1)
+            const next_availability = new Date(Date.parse(tool.ready_at+'Z'))
             return next_availability
         },
         
