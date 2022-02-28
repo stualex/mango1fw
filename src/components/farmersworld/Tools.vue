@@ -51,9 +51,13 @@ export default {
 
         showDurability(tool) {
             const toolconf = this.toolconfs.filter(e => e.template_id === tool.template_id)[0]
-            if (toolconf.durability_consumed > tool.current_durability && this.autoclaim)
+            if (toolconf.durability_consumed * this.getClaims(tool) > tool.current_durability && this.autoclaim)
                 this.emitRepair(tool)
             return tool.current_durability + '/' + tool.durability
+        },
+
+        getClaims(tool){
+            return Math.abs(Math.trunc((new Date(tool.next_availability * 1000) - new Date()) / 1000 / 3600)) + 1
         },
         
         async getTables() {
