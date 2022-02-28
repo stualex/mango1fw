@@ -42,7 +42,7 @@ Vue.prototype.$store = new Vuex.Store({
     wax : Object,
     waxjs : waxjs,
     path : "https://mypinata.cloud/ipfs/",
-    rpcList : [
+    rpcList : ['https://wax.eosphere.io',
       'https://wax.pink.gg',
       'https://wax.dapplica.io',
       'https://api.waxsweden.org',
