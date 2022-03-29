@@ -51,7 +51,7 @@ export default {
 
         showDurability(tool) {
             const toolconf = this.toolconfs.filter(e => e.template_id === tool.template_id)[0]
-            if (toolconf.durability_consumed * this.getClaims(tool) > tool.current_durability && this.autoclaim)
+            if (toolconf.durability_consumed * this.getClaims(tool) > tool.current_durability && this.autoclaim && tool.current_durability !== tool.durability)
                 this.emitRepair(tool)
             return tool.current_durability + '/' + tool.durability
         },
